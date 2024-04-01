@@ -6,6 +6,7 @@ import gdx.liftoff.data.files.CopiedFile
 import gdx.liftoff.data.files.path
 import gdx.liftoff.data.libraries.Library
 import gdx.liftoff.data.libraries.Repository
+import gdx.liftoff.data.libraries.camelCaseToKebabCase
 import gdx.liftoff.data.libraries.official.Box2D
 import gdx.liftoff.data.libraries.official.Controllers
 import gdx.liftoff.data.libraries.official.Freetype
@@ -1625,6 +1626,28 @@ class TantrumJdkgdxds : ThirdPartyExtension() {
     Fury().initiate(project)
     Jdkgdxds().initiate(project)
     TantrumDigital().initiate(project)
+  }
+}
+
+/**
+ * DI and config library - Dependency Injection distilled and optimized for high performance simulations and games.
+ * This dependency adds both bento-core and the bento-gdx glue utils.
+ * @author Filip Dreger
+ */
+@Extension
+class Bento : ThirdPartyExtension() {
+  override val id = "bento"
+  override val defaultVersion = "1.7.0"
+  override val group = "net.snowyhollows.bento"
+  override val url = "https://github.com/snowyhollows/bento"
+  override val name = id.camelCaseToKebabCase()
+  override fun initiateDependencies(project: Project) {
+    addSpecialDependency(project, Core.ID, "annotationProcessor \"${group}:bento-generator:${defaultVersion}\"")
+    addDependency(project, Core.ID, "${group}:bento-gdx")
+    addSpecialDependency(project, GWT.ID, "implementation(\"${group}:bento-core:${defaultVersion}:sources\")")
+    addSpecialDependency(project, GWT.ID, "implementation(\"${group}:bento-gdx:${defaultVersion}:sources\")")
+    addSpecialDependency(project, GWT.ID, "implementation(\"${group}:bento-config:${defaultVersion}:sources\")")
+    addGwtInherit(project, "net.snowyhollows.bento.gdx")
   }
 }
 
