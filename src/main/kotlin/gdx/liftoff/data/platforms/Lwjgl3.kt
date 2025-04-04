@@ -4,6 +4,7 @@ import gdx.liftoff.data.files.CopiedFile
 import gdx.liftoff.data.files.SourceFile
 import gdx.liftoff.data.files.gradle.GradleFile
 import gdx.liftoff.data.files.path
+import gdx.liftoff.data.libraries.unofficial.Saaf4jFmod
 import gdx.liftoff.data.project.Project
 import gdx.liftoff.views.GdxPlatform
 
@@ -316,6 +317,8 @@ startScripts.classpath = project.tasks.jar.outputs.files
 if(enableGraalNative == 'true') {
   apply from: file("nativeimage.gradle")
 }
+
+${if (project.extensions.isSelected("saaf4jFmod")) Saaf4jFmod.lwjgl3Task else ""}
 
 """.trimIndent()
 }

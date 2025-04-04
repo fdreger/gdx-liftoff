@@ -1,5 +1,6 @@
 package gdx.liftoff.data.files.gradle
 
+import gdx.liftoff.data.libraries.unofficial.Saaf4jFmod
 import gdx.liftoff.data.platforms.Android
 import gdx.liftoff.data.platforms.TeaVM
 import gdx.liftoff.data.project.Project
@@ -112,6 +113,8 @@ subprojects {
       }}
   }
 }
+
+${if (project.extensions.isSelected("saaf4jFmod")) Saaf4jFmod.rootHelper else ""}
 
 eclipse.project.name = '${project.basic.name}' + '-parent'
 """

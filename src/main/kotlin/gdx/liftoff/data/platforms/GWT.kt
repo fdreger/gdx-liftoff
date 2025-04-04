@@ -6,6 +6,7 @@ import gdx.liftoff.data.files.CopiedFile
 import gdx.liftoff.data.files.SourceFile
 import gdx.liftoff.data.files.gradle.GradleFile
 import gdx.liftoff.data.files.path
+import gdx.liftoff.data.libraries.unofficial.Saaf4jFmod
 import gdx.liftoff.data.project.Project
 import gdx.liftoff.views.GdxPlatform
 
@@ -398,6 +399,8 @@ tasks.checkGwt.dependsOn("addSource")
 java.sourceCompatibility = ${if (project.advanced.gwtVersion == "2.10.0" || project.advanced.gwtVersion == "2.11.0") "JavaVersion.VERSION_11" else "JavaVersion.VERSION_1_8"}
 java.targetCompatibility = ${if (project.advanced.gwtVersion == "2.10.0" || project.advanced.gwtVersion == "2.11.0") "JavaVersion.VERSION_11" else "JavaVersion.VERSION_1_8"}
 sourceSets.main.java.srcDirs = [ "src/main/java/" ]
+
+${if (project.extensions.isSelected("saaf4jFmod")) Saaf4jFmod.htmlTask else ""}
 
 eclipse.project.name = appName + "-html"
 """ + (

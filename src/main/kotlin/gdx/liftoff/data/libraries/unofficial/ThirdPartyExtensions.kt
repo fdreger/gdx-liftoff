@@ -417,6 +417,107 @@ class TextraTypist : ThirdPartyExtension() {
 }
 
 /**
+ * Adaptive audio library facade with FMOD integration
+ * (requires separate download of the FMOD SDK, for licensing reasons).
+ * @author Filip Dreger
+ */
+@Extension
+class Saaf4jFmod : ThirdPartyExtension() {
+  override val id = "saaf4jFmod"
+  override val defaultVersion = "0.2"
+  override val url = "https://github.com/snowyhollows/saaf4j"
+  override val repository = Repository.JitPack
+  override val group = "net.snowyhollows"
+  override val name = "saaf4jFmod"
+
+  override fun initiateDependencies(project: Project) {
+    project.properties["fmodSdkPath"] = "change/this/to/path/to/your/fmod_sdk/directory"
+    addDependency(project, Core.ID, "net.snowyhollows.saaf4j:saaf4j-core")
+    addDependency(project, Lwjgl3.ID, "net.snowyhollows.saaf4j:saaf4j-fmod-desktop")
+    addDependency(project, GWT.ID, "net.snowyhollows.saaf4j:saaf4j-core:sources")
+    addDependency(project, GWT.ID, "net.snowyhollows.saaf4j:saaf4j-fmod-gwt:sources")
+    addDependency(project, GWT.ID, "net.snowyhollows.saaf4j:saaf4j-fmod-gwt")
+  }
+
+  companion object {
+    val htmlTask =
+      """
+      createCopyFromFmodSdkTask(
+        project, "copyGwtNatives",
+
+        ['the html5 SDK zip from "FMOD Engine" pane',
+         'fmodstudioapi*html5.zip',
+         ['*/api/studio/lib/wasm/fmodstudio.js',
+          '*/api/studio/lib/wasm/fmodstudio.wasm'],
+         'net/bajobongo/ofg/gwt/public/saaf4j'])
+      """.trimIndent()
+
+    val lwjgl3Task =
+      """
+      createCopyFromFmodSdkTask(
+          project, "copyDesktopNatives",
+
+          ['Windows zip from "FMOD for Unreal" pane',
+           'fmodstudio*ue*win64.zip',
+           ['FMODStudio/Binaries/Win64/fmodstudio.dll', 'FMODStudio/Binaries/Win64/fmod.dll'],
+           'windows/x64/net/snowyhollows/saaf4j'],
+
+          ['Linux zip from the "FMOD for Unreal" pane',
+           'fmodstudio*ue*linux.zip',
+           ['FMODStudio/Binaries/Linux/x86_64/libfmodstudio.so', 'FMODStudio/Binaries/Linux/x86_64/libfmod.so'],
+           'linux/x64/net/snowyhollows/saaf4j'],
+
+          ['Mac zip from the "FMOD for Unreal" pane',
+           'fmodstudio*ue*mac.zip',
+           ['FMODStudio/Binaries/Mac/libfmodstudio.dylib', 'FMODStudio/Binaries/Mac/libfmod.dylib'],
+           'macos/arm64/net/snowyhollows/saaf4j'],
+      )
+      """.trimIndent()
+
+    val rootHelper =
+      """
+      // FMOD SDK setup helper
+      ext.createCopyFromFmodSdkTask = { subproject, taskName, java.util.List<?>... targets ->
+        subproject.tasks.register(taskName) {
+          def fmodSdkPath = subproject.properties['fmodSdkPath'] ?: System.getenv('FMOD_SDK_PATH')
+          assert (fmodSdkPath != null)
+
+          outputs.dir(subproject.sourceSets.main.output.resourcesDir)
+
+          doLast {
+            targets.each { target ->
+              assert (target instanceof List && target.size() == 4)
+              def (humanReadableSource, zipFilePattern, sourceJarPathsInZip, destinationSubPath) = target
+
+              def destinationDir = new File(subproject.sourceSets.main.output.resourcesDir, destinationSubPath)
+              destinationDir.mkdirs()
+
+              def matchingZip = fileTree(fmodSdkPath).matching {
+                include zipFilePattern
+              }.files.stream().findFirst().orElseThrow(() -> new GradleException("Missing ${'$'}humanReadableSource from ${'$'}fmodSdkPath"));
+
+
+              for (String sourceJarPathInZip : sourceJarPathsInZip) {
+                subproject.copy {
+                  from subproject.zipTree(matchingZip).matching {
+                    include sourceJarPathInZip
+                  }.getSingleFile()
+                  into destinationDir
+                  rename { name -> new File(sourceJarPathInZip).name }
+                }
+              }
+            }
+          }
+        }
+        subproject.tasks.named('processResources').configure {
+          dependsOn taskName
+        }
+      }
+      """.trimIndent()
+  }
+}
+
+/**
  * A high-performance alternative to libGDX's built-in ShapeRenderer, with smoothing and more shapes.
  * Usually more practical when compared with ShapeRenderer, but ShapeRenderer may perform better when
  * rendering hair-thin lines or points.
