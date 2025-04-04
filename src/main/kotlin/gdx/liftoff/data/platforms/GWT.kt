@@ -400,7 +400,7 @@ java.sourceCompatibility = ${if (project.advanced.gwtVersion == "2.10.0" || proj
 java.targetCompatibility = ${if (project.advanced.gwtVersion == "2.10.0" || project.advanced.gwtVersion == "2.11.0") "JavaVersion.VERSION_11" else "JavaVersion.VERSION_1_8"}
 sourceSets.main.java.srcDirs = [ "src/main/java/" ]
 
-${if (project.extensions.isSelected("saaf4jFmod")) Saaf4jFmod.htmlTask else ""}
+${if (project.extensions.isSelected("saaf4jFmod")) Saaf4jFmod.htmlTask(project) else ""}
 
 eclipse.project.name = appName + "-html"
 """ + (

@@ -9,14 +9,7 @@ import gdx.liftoff.data.libraries.Repository
 import gdx.liftoff.data.libraries.official.Box2D
 import gdx.liftoff.data.libraries.official.Controllers
 import gdx.liftoff.data.libraries.official.Freetype
-import gdx.liftoff.data.platforms.Android
-import gdx.liftoff.data.platforms.Assets
-import gdx.liftoff.data.platforms.Core
-import gdx.liftoff.data.platforms.GWT
-import gdx.liftoff.data.platforms.Headless
-import gdx.liftoff.data.platforms.IOS
-import gdx.liftoff.data.platforms.Lwjgl2
-import gdx.liftoff.data.platforms.Lwjgl3
+import gdx.liftoff.data.platforms.*
 import gdx.liftoff.data.project.Project
 import gdx.liftoff.views.Extension
 
@@ -437,10 +430,11 @@ class Saaf4jFmod : ThirdPartyExtension() {
     addDependency(project, GWT.ID, "net.snowyhollows.saaf4j:saaf4j-core:sources")
     addDependency(project, GWT.ID, "net.snowyhollows.saaf4j:saaf4j-fmod-gwt:sources")
     addDependency(project, GWT.ID, "net.snowyhollows.saaf4j:saaf4j-fmod-gwt")
+    addGwtInherit(project, "net.snowyhollows.saaf4j.saaf4jfmod")
   }
 
   companion object {
-    val htmlTask =
+    fun htmlTask(project: Project): String =
       """
       createCopyFromFmodSdkTask(
         project, "copyGwtNatives",
@@ -449,7 +443,7 @@ class Saaf4jFmod : ThirdPartyExtension() {
          'fmodstudioapi*html5.zip',
          ['*/api/studio/lib/wasm/fmodstudio.js',
           '*/api/studio/lib/wasm/fmodstudio.wasm'],
-         'net/bajobongo/ofg/gwt/public/saaf4j'])
+         '${project.basic.rootPackage.replace('.', '/')}/public_html/saaf4j'])
       """.trimIndent()
 
     val lwjgl3Task =

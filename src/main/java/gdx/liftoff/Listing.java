@@ -98,6 +98,7 @@ public final class Listing {
             new TypingLabel(),
             new TextraTypist(),
             new ShapeDrawer(),
+            new Saaf4jFmod(),
             new SimpleGraphs(),
             new Formic(),
             new Colorful(),
